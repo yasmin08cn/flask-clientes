@@ -1,10 +1,9 @@
 from flask import Flask, render_template, request, redirect
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
+import os
 
 app = Flask(__name__)
-
-import os  # Adicione esta linha no topo do arquivo
 
 app.config['MYSQL_HOST'] = os.getenv('mysql.railway.internal', 'localhost')
 app.config['MYSQL_USER'] = os.getenv('root', 'Yasmin')
@@ -20,16 +19,19 @@ def index():
 
 @app.route('/add', methods=['POST'])
 def add_cliente():
-    nome = request.form['nome']
-    email = request.form['email']
-    telefone = request.form['telefone']
-    
-    cursor = mysql.connection.cursor()
-    cursor.execute('INSERT INTO clientes (nome, email, telefone) VALUES (%s, %s, %s)', (nome, email, telefone))
-    mysql.connection.commit()
-    cursor.close()
-    
-    return "Cliente adicionado com sucesso!"
+    try:
+        nome = request.form['nome']
+        email = request.form['email']
+        telefone = request.form['telefone']
+        
+        cursor = mysql.connection.cursor()
+        cursor.execute('INSERT INTO clientes (nome, email, telefone) VALUES (%s, %s, %s)', (nome, email, telefone))
+        mysql.connection.commit()
+        cursor.close()
+        
+        return "Cliente adicionado com sucesso!"
+    except Exception as e:
+        return f"Ocorreu um erro: {e}"
 
 if __name__ == '__main__':
     app.run(debug=True)
